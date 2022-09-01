@@ -1,29 +1,33 @@
-import Head from 'next/head'
-// import Image from 'next/image'
-// import styles from '../styles/Home.module.css'
-import Header  from './Header'
-import Main from './Main'
-import Footer from './Footer'
+import { useState } from 'react'
+import LoginForm from '../components/login-form'
+import CookieStandAdmin from '../components/cookie-stand-admin'
+import { getTokens } from '../services/data-fetcher'
 
 
 export default function Home() {
 
-  return (
-    <div className=''>
-      <Head>
-        <title>Cookie Stand Admin</title>
-        <meta name="description" content="App to handle admin cookies " />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+    const [tokens, setTokens] = useState();
 
-      <Header />
+    const [username, setUsername] = useState('');
 
-      <main className='flex flex-col py-4 space-y-8 items-center'>
-        <Main />
-      </main>
-      
-      <Footer />
-       
-    </div>
-  )
+    async function loginHandler(values) {
+
+        const fetchedTokens = await getTokens(values);
+
+        setTokens(fetchedTokens);
+
+        setUsername(values.username);
+    }
+
+    function logoutHandler() {
+        setTokens(null);
+    }
+
+    if (!tokens) return <LoginForm onSubmit={loginHandler} />
+
+    return <CookieStandAdmin
+        tokens={tokens}
+        onLogout={logoutHandler}
+        username={username}
+    />
 }
